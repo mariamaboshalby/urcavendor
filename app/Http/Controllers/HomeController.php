@@ -43,7 +43,7 @@ class HomeController extends Controller
 
         // Featured Products (cached 30 mins)
         $featuredProducts = Cache::remember('home_featured_products', 1800, function () use ($mapProduct, $selectCols) {
-            $items = Product::active()
+            $items = Product::published()
                 ->featured()
                 ->select(array_merge($selectCols, ['is_featured']))
                 ->with(['media' => fn($q) => $q->where('collection_name', 'product-images')])
@@ -54,7 +54,7 @@ class HomeController extends Controller
                 ->toArray();
 
             if (empty($items)) {
-                $items = Product::active()
+                $items = Product::published()
                     ->select($selectCols)
                     ->with(['media' => fn($q) => $q->where('collection_name', 'product-images')])
                     ->latest('id')
@@ -115,7 +115,7 @@ class HomeController extends Controller
 
         // Best Selling Products (cached 30 mins)
         $bestSellingProducts = Cache::remember('home_best_selling_products', 1800, function () use ($mapProduct, $selectCols) {
-            return Product::active()
+            return Product::published()
                 ->select(array_merge($selectCols, ['sales_count']))
                 ->with(['media' => fn($q) => $q->where('collection_name', 'product-images')])
                 ->orderBy('sales_count', 'desc')
@@ -135,7 +135,7 @@ class HomeController extends Controller
 
         // Most Visited Products (cached 30 mins)
         $mostVisitedProducts = Cache::remember('home_most_visited_products', 1800, function () use ($mapProduct, $selectCols) {
-            return Product::active()
+            return Product::published()
                 ->select(array_merge($selectCols, ['views_count']))
                 ->with(['media' => fn($q) => $q->where('collection_name', 'product-images')])
                 ->orderBy('views_count', 'desc')
@@ -147,7 +147,7 @@ class HomeController extends Controller
 
         // Latest Products (cached 30 mins)
         $latestProducts = Cache::remember('home_latest_products', 1800, function () use ($mapProduct, $selectCols) {
-            return Product::active()
+            return Product::published()
                 ->select($selectCols)
                 ->with(['media' => fn($q) => $q->where('collection_name', 'product-images')])
                 ->latest('id')
@@ -161,6 +161,11 @@ class HomeController extends Controller
         $settings = Cache::remember('home_settings_map', 3600, function () {
             return Setting::pluck('value', 'key')->toArray();
         });
+
+        $sliderImages = array_key_exists('home_slider_images', $settings)
+            ? json_decode($settings['home_slider_images'], true)
+            : Setting::HOME_SLIDER_DEFAULTS;
+        $sliderImages = is_array($sliderImages) ? $sliderImages : Setting::HOME_SLIDER_DEFAULTS;
 
         // Deal of the Day (cached 30 mins)
         $dealProduct = null;
@@ -196,7 +201,7 @@ class HomeController extends Controller
         $recommendedProducts = [];
         if (($settings['home_show_recommended'] ?? '0') == '1') {
             $recommendedProducts = Cache::remember('home_recommended_products', 900, function () use ($mapProduct, $selectCols) {
-                return Product::active()
+                return Product::published()
                     ->select($selectCols)
                     ->with(['media' => fn($q) => $q->where('collection_name', 'product-images')])
                     ->inRandomOrder()
@@ -210,7 +215,7 @@ class HomeController extends Controller
         return view('home', compact(
             'featuredProducts', 'stats', 'blogPosts', 'downloads', 'testimonials',
             'bestSellingProducts', 'topCategories', 'mostVisitedProducts', 'latestProducts',
-            'settings', 'dealProduct', 'brands', 'faqs', 'recommendedProducts'
+            'settings', 'sliderImages', 'dealProduct', 'brands', 'faqs', 'recommendedProducts'
         ));
     }
 }

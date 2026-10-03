@@ -24,7 +24,7 @@ class WishlistController extends Controller
         RateLimiter::hit($key, 60);
 
         // Validate product exists and is active
-        $product = Product::active()->select('id', 'name', 'price', 'image')->find($productId);
+        $product = Product::published()->select('id', 'name', 'price', 'image')->find($productId);
         if (! $product) {
             return response()->json(['error' => 'Product not found.'], 404);
         }
@@ -102,7 +102,7 @@ class WishlistController extends Controller
         ]);
 
         $user       = Auth::user();
-        $productIds = Product::active()
+        $productIds = Product::published()
                         ->whereIn('id', $request->ids)
                         ->pluck('id')
                         ->toArray();

@@ -59,12 +59,18 @@ class CartController extends Controller
 
     public function add(Request $request)
     {
+        $product = \App\Models\Product::with('vendor')->find($request->input('product_id'));
+
+        if (! $product || ! $product->isPublished()) {
+            return response()->json(['success' => false, 'message' => 'المنتج غير متاح.'], 422);
+        }
+
         $cart = session()->get('cart', []);
 
-        $productId   = $request->input('product_id');
-        $productName = $request->input('product_name');
-        $productPrice= $request->input('product_price');
-        $productImage= $request->input('product_image');
+        $productId   = $product->id;
+        $productName = $product->name;
+        $productPrice= (float) $product->price;
+        $productImage= $request->input('product_image') ?: $product->getMainImageUrl('thumb');
         $quantity    = (int)$request->input('quantity', 1);
 
         if (isset($cart[$productId])) {

@@ -14,9 +14,12 @@ class DashboardController extends Controller
         $stats = [
             'total_products' => Product::count(),
             'active_products' => Product::active()->count(),
+            'pending_products' => Product::where('approval_status', 'pending')->count(),
             'total_orders' => Order::count(),
             'pending_orders' => Order::where('status', 'pending')->count(),
             'total_revenue' => Order::where('payment_status', 'paid')->sum('total'),
+            'platform_commission' => \App\Models\Commission::where('status', '!=', 'cancelled')->sum('commission_amount'),
+            'pending_vendors' => \App\Models\Vendor::where('status', 'pending')->count(),
             'today_orders' => Order::whereDate('created_at', today())->count(),
             'total_blog_posts' => \App\Models\BlogPost::count(),
             'total_downloads' => \App\Models\Download::count(),

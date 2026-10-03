@@ -55,8 +55,8 @@
                         </div>
                         <h5 class="fw-bold mb-2" style="color:#0f172a;">
                             {{ app()->getLocale() === 'ar' ? 'البريد الإلكتروني' : 'Email' }}</h5>
-                        <a href="mailto:urcasami.tv@gmail.com" class="text-primary text-decoration-none fw-semibold"
-                            style="font-size:.9rem;">urcasami.tv@gmail.com</a>
+                        <a href="mailto:urca .tv@gmail.com" class="text-primary text-decoration-none fw-semibold"
+                            style="font-size:.9rem;">urca .tv@gmail.com</a>
                     </div>
                 </div>
 

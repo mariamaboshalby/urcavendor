@@ -58,9 +58,29 @@ class User extends Authenticatable
         return $this->role === 'admin';
     }
 
+    public function isVendor(): bool
+    {
+        return $this->role === 'vendor';
+    }
+
+    public function isCustomer(): bool
+    {
+        return in_array($this->role, ['user', 'customer'], true);
+    }
+
+    public function isApprovedVendor(): bool
+    {
+        return $this->isVendor() && $this->vendor && $this->vendor->isApproved();
+    }
+
+    public function vendor()
+    {
+        return $this->hasOne(Vendor::class);
+    }
+
     public function orders()
     {
-        return $this->hasMany(\App\Models\Order::class, 'customer_email', 'email');
+        return $this->hasMany(\App\Models\Order::class);
     }
 
     public function wishlists()

@@ -69,9 +69,12 @@ class ExternalProductSyncService
                 $existing = Product::where('name', $productData['name'])->first();
 
                 if ($existing) {
+                    unset($productData['vendor_id']);
                     $existing->update($productData);
                     $updatedCount++;
                 } else {
+                    $productData['vendor_id'] = app(\App\Services\VendorService::class)->defaultVendor()->id;
+                    $productData['approval_status'] = 'approved';
                     Product::create($productData);
                     $createdCount++;
                 }

@@ -33,6 +33,10 @@ class ProductController extends Controller
             'reviews'     => $p->reviews,
             'description' => $p->description,
             'specs'       => $p->specs ?? [],
+            'vendor'      => $p->vendor ? [
+                'store_name' => $p->vendor->store_name,
+                'store_slug' => $p->vendor->store_slug,
+            ] : null,
         ];
     }
 
@@ -118,14 +122,16 @@ class ProductController extends Controller
      */
     private function buildProductQuery(string $category, string $sort, ?string $search)
     {
-        $query = Product::active()
+        $query = Product::published()
             ->select([
-                'id', 'name', 'brand', 'category',
+                'id', 'vendor_id', 'name', 'brand', 'category',
                 'price', 'old_price', 'badge', 'badge_color',
                 'rating', 'reviews', 'image', 'description',
                 'is_active',
             ])
-            ->with(['media' => fn($q) => $q->select([
+            ->with([
+                'vendor:id,store_name,store_slug',
+                'media' => fn($q) => $q->select([
                 'id', 'model_id', 'model_type', 'uuid', 'collection_name',
                 'name', 'file_name', 'mime_type', 'disk', 'conversions_disk',
                 'size', 'generated_conversions', 'custom_properties',
@@ -175,14 +181,16 @@ class ProductController extends Controller
     {
         // Cache individual product data (5 min TTL — invalidated on update/delete)
         $productData = Cache::remember("product_show:{$id}", 300, function () use ($id) {
-            $product = Product::active()
+            $product = Product::published()
                 ->select([
-                    'id', 'name', 'brand', 'category', 'description',
+                    'id', 'vendor_id', 'name', 'brand', 'category', 'description',
                     'price', 'old_price', 'badge', 'badge_color',
                     'rating', 'reviews', 'image', 'specs',
                     'is_active',
                 ])
-                ->with(['media' => fn($q) => $q
+                ->with([
+                    'vendor:id,store_name,store_slug,logo,description,rating,reviews_count',
+                    'media' => fn($q) => $q
                     ->select([
                         'id', 'model_id', 'model_type', 'uuid', 'collection_name',
                         'name', 'file_name', 'mime_type', 'disk', 'conversions_disk',
@@ -196,14 +204,16 @@ class ProductController extends Controller
 
             $categorySlug = $product->getRawOriginal('category');
 
-            $related = Product::active()
+            $related = Product::published()
                 ->select([
-                    'id', 'name', 'brand', 'category',
+                    'id', 'vendor_id', 'name', 'brand', 'category',
                     'price', 'old_price', 'badge', 'badge_color',
                     'rating', 'reviews', 'image', 'description',
                     'is_active',
                 ])
-                ->with(['media' => fn($q) => $q
+                ->with([
+                    'vendor:id,store_name,store_slug',
+                    'media' => fn($q) => $q
                     ->select([
                         'id', 'model_id', 'model_type', 'uuid', 'collection_name',
                         'name', 'file_name', 'mime_type', 'disk', 'conversions_disk',
@@ -236,7 +246,7 @@ class ProductController extends Controller
     {
         $lazy = $request->boolean('lazy', true);
 
-        $products = Product::active()
+        $products = Product::published()
             ->when(! $lazy, fn ($query) => $query->with('category'))
             ->when(
                 $lazy,

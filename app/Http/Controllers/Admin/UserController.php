@@ -35,6 +35,7 @@ class UserController extends Controller
         $stats = [
             'total'   => User::count(),
             'admins'  => User::where('role', 'admin')->count(),
+            'vendors' => User::where('role', 'vendor')->count(),
             'active'  => User::where('is_active', true)->count(),
             'new_this_month' => User::whereMonth('created_at', now()->month)->count(),
         ];
@@ -53,7 +54,7 @@ class UserController extends Controller
             'name'     => 'required|string|max:255',
             'email'    => 'required|email|unique:users,email',
             'phone'    => 'nullable|string|max:20',
-            'role'     => 'required|in:admin,user',
+            'role'     => 'required|in:admin,user,vendor,customer',
             'password' => ['required', Password::min(8)],
             'is_active' => 'boolean',
         ]);
@@ -83,7 +84,7 @@ class UserController extends Controller
             'name'     => 'required|string|max:255',
             'email'    => 'required|email|unique:users,email,' . $user->id,
             'phone'    => 'nullable|string|max:20',
-            'role'     => 'required|in:admin,user',
+            'role'     => 'required|in:admin,user,vendor,customer',
             'password' => ['nullable', Password::min(8)],
             'is_active' => 'boolean',
         ]);

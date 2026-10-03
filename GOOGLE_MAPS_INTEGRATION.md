@@ -124,7 +124,7 @@ const marker = new google.maps.Marker({
 | النوع / Type | القيمة / Value |
 |--------------|----------------|
 | الهاتف / Phone | +20 10 01324539 |
-| البريد / Email | urcasami.tv@gmail.com |
+| البريد / Email | urca .tv@gmail.com |
 | العنوان / Address | {{ __('app.footer_address') }} |
 | أوقات العمل / Hours | {{ __('app.footer_hours') }} |
 

@@ -137,16 +137,21 @@ class OrderController extends Controller
             'customer_address.required' => app()->getLocale() === 'ar' ? 'يرجى إدخال العنوان بالتفصيل' : 'Please enter your delivery address',
         ]);
 
-        $product = \App\Models\Product::findOrFail($validated['product_id']);
+        $product = \App\Models\Product::with('vendor')->findOrFail($validated['product_id']);
+        if (! $product->isPublished()) {
+            return response()->json([
+                'success' => false,
+                'message' => app()->getLocale() === 'ar' ? 'المنتج غير متاح.' : 'Product is not available.',
+            ], 422);
+        }
+
         $quantity = (int) $validated['quantity'];
         $unitPrice = (float) $product->price;
         $totalPrice = $unitPrice * $quantity;
 
         $user = \Illuminate\Support\Facades\Auth::user();
 
-        $order = Order::create([
-            'user_id'          => $user?->id,
-            'order_number'     => Order::generateOrderNumber(),
+        $order = app(\App\Services\OrderService::class)->createOrder([
             'customer_name'    => $validated['customer_name'],
             'customer_email'   => $user?->email,
             'customer_phone'   => $validated['customer_phone'],
@@ -155,28 +160,16 @@ class OrderController extends Controller
             'subtotal'         => $totalPrice,
             'shipping'         => 0,
             'total'            => $totalPrice,
-            'status'           => 'pending',
             'payment_method'   => 'cash',
             'payment_status'   => 'unpaid',
             'notes'            => $validated['notes'] ?? null,
-        ]);
-
-        \App\Models\OrderItem::create([
-            'order_id'     => $order->id,
-            'product_id'   => $product->id,
+        ], [[
+            'product' => $product,
+            'product_id' => $product->id,
             'product_name' => $product->name,
-            'price'        => $unitPrice,
-            'quantity'     => $quantity,
-            'total'        => $totalPrice,
-        ]);
-
-        // Decrement product stock if positive
-        if ($product->stock !== null && $product->stock > 0) {
-            $product->decrement('stock', min($quantity, $product->stock));
-        }
-
-        // Increment sales count
-        $product->increment('sales_count', $quantity);
+            'price' => $unitPrice,
+            'quantity' => $quantity,
+        ]], $user);
 
         $response = response()->json([
             'success'      => true,

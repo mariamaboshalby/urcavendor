@@ -289,14 +289,24 @@
                                 @if (Auth::user()->isAdmin())
                                     <li>
                                         <a href="{{ route('admin.dashboard') }}" class="dropdown-item">
-                                            <i
-                                                class="fas fa-tachometer-alt me-2 text-primary"></i>{{ __('app.nav_dashboard') }}
+                                            <i class="fas fa-tachometer-alt me-2 text-primary"></i>{{ __('app.nav_dashboard') }}
+                                        </a>
+                                    </li>
+                                @elseif (Auth::user()->isVendor())
+                                    <li>
+                                        <a href="{{ route('vendor.dashboard') }}" class="dropdown-item">
+                                            <i class="fas fa-store me-2 text-primary"></i>لوحة البائع
+                                        </a>
+                                    </li>
+                                @endif
+                                    <li>
+                                        <a href="{{ route('vendor.register') }}" class="dropdown-item">
+                                            <i class="fas fa-store me-2"></i>بيع على urca
                                         </a>
                                     </li>
                                     <li>
                                         <hr class="dropdown-divider my-1">
                                     </li>
-                                @endif
                                 <li>
                                     <form method="POST" action="{{ route('logout') }}">
                                         @csrf
@@ -398,7 +408,7 @@
                                 title="تابعنا على Facebook">
                                 <i class="fab fa-facebook-f"></i>
                             </a>
-                            <a href="https://www.instagram.com/urcasami.tv/" target="_blank"
+                            <a href="https://www.instagram.com/urca .tv/" target="_blank"
                                 rel="noopener noreferrer" class="urca-footer-social" aria-label="Instagram"
                                 title="تابعنا على Instagram">
                                 <i class="fab fa-instagram"></i>
@@ -411,7 +421,7 @@
                                 title="اتصل بنا">
                                 <i class="fas fa-phone-alt"></i>
                             </a>
-                            <a href="https://www.youtube.com/@urcasami-tv" target="_blank" rel="noopener noreferrer"
+                            <a href="https://www.youtube.com/@urca -tv" target="_blank" rel="noopener noreferrer"
                                 class="urca-footer-social" aria-label="YouTube" title="قناتنا على YouTube">
                                 <i class="fab fa-youtube"></i>
                             </a>
@@ -462,8 +472,8 @@
                             </li>
                             <li>
                                 <i class="fas fa-envelope text-primary"></i>
-                                <a href="mailto:urcasami.tv@gmail.com" class="text-decoration-none"
-                                    style="color:inherit;">urcasami.tv@gmail.com</a>
+                                <a href="mailto:urca .tv@gmail.com" class="text-decoration-none"
+                                    style="color:inherit;">urca .tv@gmail.com</a>
                             </li>
                             <li><i class="fas fa-clock text-primary"></i>{{ __('app.footer_hours') }}</li>
                         </ul>

@@ -34,6 +34,10 @@ class OrderController extends Controller
             $query->whereDate('created_at', '<=', $request->date_to);
         }
 
+        if ($request->filled('vendor_id')) {
+            $query->whereHas('items', fn ($q) => $q->where('vendor_id', $request->vendor_id));
+        }
+
         $orders = $query->latest()->paginate(15);
 
         return view('admin.orders.index', compact('orders'));
@@ -41,7 +45,7 @@ class OrderController extends Controller
 
     public function show(Order $order)
     {
-        $order->load('items.product');
+        $order->load('items.product', 'items.vendor');
         return view('admin.orders.show', compact('order'));
     }
 
@@ -51,7 +55,7 @@ class OrderController extends Controller
             'status' => 'required|in:pending,processing,shipped,delivered,cancelled',
         ]);
 
-        $order->update(['status' => $request->status]);
+        app(\App\Services\OrderService::class)->updateOrderStatus($order, $request->status);
 
         return back()->with('success', 'تم تحديث حالة الطلب بنجاح');
     }

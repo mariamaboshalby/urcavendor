@@ -157,6 +157,28 @@
             </div>
 
             <div class="adm-nav-group">
+                <span class="adm-nav-label">Marketplace</span>
+                <a href="{{ route('admin.vendors.index') }}" class="adm-nav-item {{ request()->routeIs('admin.vendors.*') ? 'is-active' : '' }}">
+                    <span class="adm-nav-icon"><i class="fas fa-store"></i></span>
+                    <span>البائعون</span>
+                    @php $pv = \App\Models\Vendor::where('status','pending')->count(); @endphp
+                    @if($pv > 0)<span class="adm-nav-badge">{{ $pv }}</span>@endif
+                </a>
+                <a href="{{ route('admin.products.index', ['approval_status' => 'pending']) }}" class="adm-nav-item">
+                    <span class="adm-nav-icon"><i class="fas fa-clipboard-check"></i></span>
+                    <span>منتجات قيد المراجعة</span>
+                </a>
+                <a href="{{ route('admin.withdrawals.index') }}" class="adm-nav-item {{ request()->routeIs('admin.withdrawals.*') ? 'is-active' : '' }}">
+                    <span class="adm-nav-icon"><i class="fas fa-wallet"></i></span>
+                    <span>السحوبات</span>
+                </a>
+                <a href="{{ route('admin.finance.index') }}" class="adm-nav-item {{ request()->routeIs('admin.finance.*') ? 'is-active' : '' }}">
+                    <span class="adm-nav-icon"><i class="fas fa-chart-line"></i></span>
+                    <span>المالية والتقارير</span>
+                </a>
+            </div>
+
+            <div class="adm-nav-group">
                 <span class="adm-nav-label">{{ __('app.system') }}</span>
                 <a href="{{ route('admin.users.index') }}"
                     class="adm-nav-item {{ request()->routeIs('admin.users.index') ? 'is-active' : '' }}">
@@ -200,6 +222,11 @@
                     class="adm-nav-item {{ request()->routeIs('admin.settings.*') ? 'is-active' : '' }}">
                     <span class="adm-nav-icon"><i class="fas fa-sliders-h"></i></span>
                     <span>{{ app()->getLocale() === 'ar' ? 'إعدادات الرئيسية' : 'Home Settings' }}</span>
+                </a>
+                <a href="{{ route('admin.sliders.index') }}"
+                    class="adm-nav-item {{ request()->routeIs('admin.sliders.*') ? 'is-active' : '' }}">
+                    <span class="adm-nav-icon"><i class="fas fa-images"></i></span>
+                    <span>{{ app()->getLocale() === 'ar' ? 'صور السلايدر' : 'Slider Images' }}</span>
                 </a>
             </div>
 

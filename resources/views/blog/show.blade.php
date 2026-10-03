@@ -131,7 +131,7 @@
                                     style="border-radius:50px;font-size:.8rem;">{{ $post->author_role }}</span>
                             @endif
                             <p class="text-secondary small mb-0">
-                                {{ app()->getLocale() === 'ar' ? 'خبير تقني ومتخصص في ملحقات وإلكترونيات الكمبيوتر' : 'Tech and computer accessories specialist at urca Sami' }}
+                                {{ app()->getLocale() === 'ar' ? 'خبير تقني ومتخصص في ملحقات وإلكترونيات الكمبيوتر' : 'Tech and computer accessories specialist at urca  ' }}
                             </p>
                         </div>
                     </div>

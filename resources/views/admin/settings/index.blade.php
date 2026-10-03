@@ -41,6 +41,22 @@
             <div class="card-body">
                 <div class="toggles-grid">
 
+                    <div class="toggle-card">
+                        <div class="toggle-icon bg-blue">
+                            <i class="fas fa-images"></i>
+                        </div>
+                        <div class="toggle-info">
+                            <div class="toggle-title">السلايدر الرئيسي</div>
+                            <div class="toggle-desc">إظهار أو إخفاء صور السلايدر في الصفحة الرئيسية</div>
+                        </div>
+                        <div class="toggle-action">
+                            <label class="switch-toggle" title="تفعيل/تعطيل">
+                                <input type="checkbox" id="home_show_slider" name="home_show_slider" value="1" {{ ($settings['home_show_slider'] ?? '1') == '1' ? 'checked' : '' }}>
+                                <span class="switch-slider"></span>
+                            </label>
+                        </div>
+                    </div>
+
                     <!-- Shop by Brand -->
                     <div class="toggle-card">
                         <div class="toggle-icon bg-blue">

@@ -53,7 +53,7 @@ return [
     'newsletter_ph'   => 'Your email address',
     'footer_address'  => 'Al Galaa St, Mansoura, Egypt',
     'footer_hours'    => 'Sat - Thu: 9AM - 9PM',
-    'footer_copy'     => '© :year urca Sami. All rights reserved.',
+    'footer_copy'     => '© :year urca  . All rights reserved.',
     'rights'          => 'crafted by core-house team',
 
     // ── Bottom Nav ──────────────────────────────────────────────────────────
@@ -71,7 +71,7 @@ return [
     // ── Home — About Section ─────────────────────────────────────────────────
     'home_about_badge'      => 'About Us',
     'home_about_title'      => 'Your #1 Tech & Computer Accessories Store in Egypt',
-    'home_about_p1'         => 'urca Sami is Egypt\'s leading <strong>authorized retailer and distributor of computer accessories and electronics</strong>, supplying top brands for mice, headphones, keyboards, printers, and flash drives at competitive prices.',
+    'home_about_p1'         => 'urca   is Egypt\'s leading <strong>authorized retailer and distributor of computer accessories and electronics</strong>, supplying top brands for mice, headphones, keyboards, printers, and flash drives at competitive prices.',
     'home_about_p2'         => 'We are the trusted partner for professionals, businesses, and gamers across Egypt. With over a decade of experience and a dedicated support team, we ensure genuine products, official warranties, and fast delivery.',
     'home_about_btn'        => 'Learn More',
     'home_stat_products'    => 'Products Available',
@@ -133,7 +133,7 @@ return [
     'home_contact_opening'    => 'Opening Gmail...',
 
     // ── Products Index ───────────────────────────────────────────────────────
-    'prod_page_title'       => 'Products - urca Sami',
+    'prod_page_title'       => 'Products - urca  ',
     'prod_header_title'     => 'Products',
     'prod_breadcrumb_home'  => 'Home',
     'prod_filter_btn'       => 'Filter Products',

@@ -1,6 +1,6 @@
 ═══════════════════════════════════════════════════════════════════
   📱 ملخص التحديثات - urca
-  Updates Summary - urca Sami
+  Updates Summary - urca  
 ═══════════════════════════════════════════════════════════════════
 
 🎨 التحديث 1: تغيير اللون الأساسي
@@ -58,9 +58,9 @@
 ✅ الهاتف: +20 10 93803270
 ✅ WhatsApp: https://wa.me/201093803270
 ✅ Facebook: https://www.facebook.com/share/181WTrqgHu/
-✅ Instagram: https://www.instagram.com/urcasami.tv/
-✅ YouTube: https://www.youtube.com/@urcasami-tv
-✅ البريد: urcasami.tv@gmail.com
+✅ Instagram: https://www.instagram.com/urca .tv/
+✅ YouTube: https://www.youtube.com/@urca -tv
+✅ البريد: urca .tv@gmail.com
 
 الميزات المضافة:
 1. روابط محدثة في Footer
@@ -157,10 +157,10 @@ project/
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 الهاتف:       +20 10 93803270
 WhatsApp:     wa.me/201093803270
-البريد:       urcasami.tv@gmail.com
+البريد:       urca .tv@gmail.com
 Facebook:     facebook.com/share/181WTrqgHu/
-Instagram:    instagram.com/urcasami.tv/
-YouTube:      youtube.com/@urcasami-tv
+Instagram:    instagram.com/urca .tv/
+YouTube:      youtube.com/@urca -tv
 العنوان:      شبين الكوم، المنوفية، مصر
 أوقات العمل:  السبت - الخميس: 9 ص - 6 م
 

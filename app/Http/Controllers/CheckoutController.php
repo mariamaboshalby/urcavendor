@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Product;
+use App\Services\OrderService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cookie;
@@ -36,9 +37,9 @@ class CheckoutController extends Controller
      */
     private function autoPlaceOrder($user, array $cart, float $total)
     {
-        $order = Order::create([
-            'user_id'          => $user->id,
-            'order_number'     => Order::generateOrderNumber(),
+        $items = $this->cartToOrderItems($cart);
+
+        $order = app(OrderService::class)->createOrder([
             'customer_name'    => $user->name,
             'customer_email'   => $user->email,
             'customer_phone'   => $user->phone,
@@ -47,26 +48,10 @@ class CheckoutController extends Controller
             'subtotal'         => $total,
             'shipping'         => 0,
             'total'            => $total,
-            'status'           => 'pending',
             'payment_method'   => 'cash',
             'payment_status'   => 'unpaid',
             'notes'            => null,
-        ]);
-
-        foreach ($cart as $item) {
-            $qty = $item['qty'] ?? $item['quantity'] ?? 1;
-
-            OrderItem::create([
-                'order_id'     => $order->id,
-                'product_id'   => $item['id'],
-                'product_name' => $item['name'],
-                'price'        => $item['price'],
-                'quantity'     => $qty,
-                'total'        => $item['price'] * $qty,
-            ]);
-
-            Product::where('id', $item['id'])->decrement('stock', $qty);
-        }
+        ], $items, $user);
 
         session()->forget('cart');
         Cookie::queue(Cookie::forget('urca_cart'));
@@ -96,9 +81,7 @@ class CheckoutController extends Controller
             fn($i) => $i['price'] * ($i['qty'] ?? $i['quantity'] ?? 1)
         );
 
-        $order = Order::create([
-            'user_id'          => Auth::id(),
-            'order_number'     => Order::generateOrderNumber(),
+        $order = app(OrderService::class)->createOrder([
             'customer_name'    => $validated['name'],
             'customer_email'   => $validated['email'],
             'customer_phone'   => $validated['phone'],
@@ -107,27 +90,10 @@ class CheckoutController extends Controller
             'subtotal'         => $subtotal,
             'shipping'         => 0,
             'total'            => $subtotal,
-            'status'           => 'pending',
             'payment_method'   => $validated['payment_method'],
             'payment_status'   => 'unpaid',
             'notes'            => $validated['notes'] ?? null,
-        ]);
-
-        foreach ($cart as $item) {
-            $qty = $item['qty'] ?? $item['quantity'] ?? 1;
-
-            OrderItem::create([
-                'order_id'     => $order->id,
-                'product_id'   => $item['id'],
-                'product_name' => $item['name'],
-                'price'        => $item['price'],
-                'quantity'     => $qty,
-                'total'        => $item['price'] * $qty,
-            ]);
-
-            // Decrement stock
-            Product::where('id', $item['id'])->decrement('stock', $qty);
-        }
+        ], $this->cartToOrderItems($cart), Auth::user());
 
         // Clear cart from session and cookie
         session()->forget('cart');
@@ -153,5 +119,32 @@ class CheckoutController extends Controller
             ->firstOrFail();
 
         return view('checkout.success', compact('order'));
+    }
+
+    private function cartToOrderItems(array $cart): array
+    {
+        $items = [];
+        foreach ($cart as $item) {
+            $product = Product::with('vendor')->find($item['id'] ?? null);
+            if (! $product || ! $product->isPublished()) {
+                continue;
+            }
+            $qty = (int) ($item['qty'] ?? $item['quantity'] ?? 1);
+            $items[] = [
+                'product' => $product,
+                'product_id' => $product->id,
+                'product_name' => $product->name,
+                'price' => (float) $product->price,
+                'quantity' => $qty,
+            ];
+        }
+
+        if (empty($items)) {
+            throw \Illuminate\Validation\ValidationException::withMessages([
+                'cart' => 'لا توجد منتجات متاحة في السلة.',
+            ]);
+        }
+
+        return $items;
     }
 }

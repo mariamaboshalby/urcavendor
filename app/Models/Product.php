@@ -13,11 +13,13 @@ class Product extends Model implements HasMedia
     use HasFactory, InteractsWithMedia;
 
     protected $fillable = [
+        'vendor_id',
         'name', 'brand', 'category', 'description',
         'price', 'old_price', 'image', 'stock',
         'badge', 'badge_color', 'rating', 'reviews',
         'sales_count', 'views_count',
         'specs', 'is_active', 'is_featured',
+        'approval_status', 'rejection_reason',
     ];
 
     protected $casts = [
@@ -90,7 +92,32 @@ class Product extends Model implements HasMedia
         return $query->where('is_featured', true);
     }
 
+    public function scopeApproved($query)
+    {
+        return $query->where('approval_status', 'approved');
+    }
+
+    public function scopePublished($query)
+    {
+        return $query->active()
+            ->approved()
+            ->whereHas('vendor', fn ($q) => $q->where('status', 'approved'));
+    }
+
+    public function isPublished(): bool
+    {
+        return $this->is_active
+            && $this->approval_status === 'approved'
+            && $this->vendor
+            && $this->vendor->isApproved();
+    }
+
     /* ── Relations ── */
+    public function vendor()
+    {
+        return $this->belongsTo(Vendor::class);
+    }
+
     public function category()
     {
         return $this->belongsTo(Category::class, 'category', 'slug');
@@ -99,5 +126,10 @@ class Product extends Model implements HasMedia
     public function orderItems()
     {
         return $this->hasMany(OrderItem::class);
+    }
+
+    public function productReviews()
+    {
+        return $this->hasMany(ProductReview::class);
     }
 }

@@ -2,13 +2,21 @@
 @section('title',
     app()->getLocale() === 'ar'
     ? 'urca - متجر إلكترونيات وملحقات الكمبيوتر'
-    : 'urca Sami - Electronics & Computer Accessories')
+    : 'urca   - Electronics & Computer Accessories')
 
+    @php
+        $sliderImageUrl = static fn ($path) => str_starts_with($path, 'sliders/')
+            ? asset('storage/' . $path)
+            : asset($path);
+        $firstSlide = $sliderImages[0] ?? null;
+        $firstDesktopImage = $firstSlide['desktop'] ?? null;
+        $firstMobileImage = $firstSlide['mobile'] ?? $firstDesktopImage;
+    @endphp
     @push('styles')
-        {{-- Preload the LCP hero image --}}
-        <link rel="preload" as="image" href="{{ asset('images/slider-1-mobile.webp') }}" type="image/webp"
-            media="(max-width: 768px)">
-        <link rel="preload" as="image" href="{{ asset('images/slider-1.webp') }}" type="image/webp" media="(min-width: 769px)">
+        @if($firstDesktopImage)
+            <link rel="preload" as="image" href="{{ $sliderImageUrl($firstMobileImage) }}" media="(max-width: 768px)">
+            <link rel="preload" as="image" href="{{ $sliderImageUrl($firstDesktopImage) }}" media="(min-width: 769px)">
+        @endif
     @endpush
     @push('styles')
         <style>
@@ -250,70 +258,34 @@
 @section('content')
 
     {{-- ===== Hero Carousel ===== --}}
+    @if(($settings['home_show_slider'] ?? '1') == '1' && count($sliderImages))
     <div class="container-fluid pt-3 pb-2 px-0">
         <div class="mx-auto rounded-4 overflow-hidden shadow-lg" style="width: 92%; max-width: none;">
             <div id="heroCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="4000">
                 <div class="carousel-indicators">
-                    <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="0" class="active"
-                        aria-current="true"></button>
-                    <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="1"></button>
-                    <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="2"></button>
-                    <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="3"></button>
-                    <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="4"></button>
+                    @foreach($sliderImages as $index => $slide)
+                        <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="{{ $index }}"
+                            class="{{ $index === 0 ? 'active' : '' }}" {{ $index === 0 ? 'aria-current="true"' : '' }}></button>
+                    @endforeach
                 </div>
                 <div class="carousel-inner px-1">
-                    {{-- First slide: eager LCP image (preloaded above) --}}
-                    <div class="carousel-item active">
+                    @foreach($sliderImages as $index => $slide)
+                        @php
+                            $desktopImage = $slide['desktop'] ?? '';
+                            $mobileImage = $slide['mobile'] ?? null;
+                            $desktopUrl = $sliderImageUrl($desktopImage);
+                            $mobileUrl = $mobileImage ? $sliderImageUrl($mobileImage) : $desktopUrl;
+                        @endphp
+                        <div class="carousel-item {{ $index === 0 ? 'active' : '' }}">
                         <picture>
-                            <source media="(max-width: 768px)" srcset="{{ asset('images/slider-1-mobile.webp') }}"
-                                type="image/webp">
-                            <source media="(min-width: 769px)" srcset="{{ asset('images/slider-1.webp') }}"
-                                type="image/webp">
-                            <img src="{{ asset('images/slider-1-mobile.webp') }}" class="d-block w-100 hero-img"
-                                alt="urca - متجر الإلكترونيات والملحقات" fetchpriority="high" decoding="async" width="1479"
-                                height="850" loading="eager">
+                                @if($mobileImage)
+                                    <source media="(max-width: 768px)" srcset="{{ $mobileUrl }}">
+                                @endif
+                                <img src="{{ $desktopUrl }}" class="d-block w-100 hero-img"
+                                    alt="urca - الشريحة {{ $index + 1 }}" {{ $index === 0 ? 'fetchpriority="high" loading="eager"' : 'loading="lazy"' }} decoding="async" width="1600" height="850">
                         </picture>
-                    </div>
-                    <div class="carousel-item">
-                        <picture>
-                            <source media="(max-width: 768px)" srcset="{{ asset('images/slider-2-mobile.webp') }}"
-                                type="image/webp">
-                            <source media="(min-width: 769px)" srcset="{{ asset('images/slider-2.webp') }}"
-                                type="image/webp">
-                            <img src="{{ asset('images/slider-2-mobile.webp') }}" class="d-block w-100 hero-img"
-                                alt="Slide 2" loading="lazy" decoding="async" width="1600" height="891">
-                        </picture>
-                    </div>
-                    <div class="carousel-item">
-                        <picture>
-                            <source media="(max-width: 768px)" srcset="{{ asset('images/slider-3-mobile.webp') }}"
-                                type="image/webp">
-                            <source media="(min-width: 769px)" srcset="{{ asset('images/slider-3.webp') }}"
-                                type="image/webp">
-                            <img src="{{ asset('images/slider-3-mobile.webp') }}" class="d-block w-100 hero-img"
-                                alt="Slide 3" loading="lazy" decoding="async" width="810" height="1080">
-                        </picture>
-                    </div>
-                    <div class="carousel-item">
-                        <picture>
-                            <source media="(max-width: 768px)" srcset="{{ asset('images/slider-4-mobile.webp') }}"
-                                type="image/webp">
-                            <source media="(min-width: 769px)" srcset="{{ asset('images/slider-4.webp') }}"
-                                type="image/webp">
-                            <img src="{{ asset('images/slider-4-mobile.webp') }}" class="d-block w-100 hero-img"
-                                alt="Slide 4" loading="lazy" decoding="async" width="1600" height="743">
-                        </picture>
-                    </div>
-                    <div class="carousel-item">
-                        <picture>
-                            <source media="(max-width: 768px)" srcset="{{ asset('images/slider-5-mobile.webp') }}"
-                                type="image/webp">
-                            <source media="(min-width: 769px)" srcset="{{ asset('images/slider-5.webp') }}"
-                                type="image/webp">
-                            <img src="{{ asset('images/slider-5-mobile.webp') }}" class="d-block w-100 hero-img"
-                                alt="Slide 5" loading="lazy" decoding="async" width="1024" height="735">
-                        </picture>
-                    </div>
+                        </div>
+                    @endforeach
                 </div>
                 <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel"
                     data-bs-slide="prev">
@@ -325,6 +297,7 @@
                 </button>
             </div>
         </div>
+        @endif
 
         {{-- ===== About Us Section ===== --}}
         <section class="py-5 bg-white">
@@ -1384,7 +1357,7 @@
                         'Message:\n' + message
                     );
 
-                    const gmailUrl = 'https://mail.google.com/mail/?view=cm&fs=1&to=urcasami.tv%40gmail.com&su=' +
+                    const gmailUrl = 'https://mail.google.com/mail/?view=cm&fs=1&to=urca .tv%40gmail.com&su=' +
                         gmailSubject +
                         '&body=' + gmailBody;
                     window.open(gmailUrl, '_blank');

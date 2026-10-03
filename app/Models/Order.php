@@ -42,6 +42,11 @@ class Order extends Model
         return $this->hasMany(OrderItem::class);
     }
 
+    public function commissions()
+    {
+        return $this->hasMany(Commission::class);
+    }
+
     public function getStatusLabelAttribute(): string
     {
         return match($this->status) {

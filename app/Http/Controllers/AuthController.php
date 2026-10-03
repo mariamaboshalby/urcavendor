@@ -16,7 +16,7 @@ class AuthController extends Controller
         if (Auth::check()) {
             $redirect = Auth::user()->role === 'admin'
                 ? route('admin.dashboard')
-                : route('home');
+                : (Auth::user()->isVendor() ? route('vendor.dashboard') : route('home'));
             return redirect($redirect);
         }
         return view('auth.login');
@@ -42,6 +42,10 @@ class AuthController extends Controller
                 return redirect()->intended(route('admin.dashboard'));
             }
 
+            if (Auth::user()->isVendor()) {
+                return redirect()->intended(route('vendor.dashboard'));
+            }
+
             return redirect()->intended(route('home'));
         }
 
@@ -54,7 +58,7 @@ class AuthController extends Controller
         if (Auth::check()) {
             $redirect = Auth::user()->role === 'admin'
                 ? route('admin.dashboard')
-                : route('home');
+                : (Auth::user()->isVendor() ? route('vendor.dashboard') : route('home'));
             return redirect($redirect);
         }
         return view('auth.register');

@@ -28,16 +28,26 @@ class ProductController extends Controller
             $query->where('is_active', $request->status === 'active');
         }
 
-        $products = $query->latest()->paginate(15);
-        $categories = \App\Models\Category::active()->get();
+        if ($request->filled('approval_status')) {
+            $query->where('approval_status', $request->approval_status);
+        }
 
-        return view('admin.products.index', compact('products', 'categories'));
+        if ($request->filled('vendor_id')) {
+            $query->where('vendor_id', $request->vendor_id);
+        }
+
+        $products = $query->with('vendor')->latest()->paginate(15);
+        $categories = \App\Models\Category::active()->get();
+        $vendors = \App\Models\Vendor::orderBy('store_name')->get();
+
+        return view('admin.products.index', compact('products', 'categories', 'vendors'));
     }
 
     public function create()
     {
         $categories = \App\Models\Category::active()->get();
-        return view('admin.products.create', compact('categories'));
+        $vendors = \App\Models\Vendor::orderBy('store_name')->get();
+        return view('admin.products.create', compact('categories', 'vendors'));
     }
 
     public function store(Request $request)
@@ -57,10 +67,14 @@ class ProductController extends Controller
             'images'         => 'nullable|array',
             'images.*'       => 'image|mimes:jpg,jpeg,png,webp|max:51200',
             'image'          => 'nullable|image|mimes:jpg,jpeg,png,webp|max:51200',
+            'vendor_id'      => 'nullable|exists:vendors,id',
+            'approval_status'=> 'nullable|in:pending,approved,rejected,inactive',
         ]);
 
         $validated['is_active']   = $request->boolean('is_active');
         $validated['is_featured'] = $request->boolean('is_featured');
+        $validated['vendor_id']   = $validated['vendor_id'] ?? app(\App\Services\VendorService::class)->defaultVendor()->id;
+        $validated['approval_status'] = $validated['approval_status'] ?? 'approved';
 
         // إزالة images من البيانات قبل الحفظ
         unset($validated['images']);
@@ -90,7 +104,8 @@ class ProductController extends Controller
     public function edit(Product $product)
     {
         $categories = \App\Models\Category::active()->get();
-        return view('admin.products.edit', compact('product', 'categories'));
+        $vendors = \App\Models\Vendor::orderBy('store_name')->get();
+        return view('admin.products.edit', compact('product', 'categories', 'vendors'));
     }
 
     public function update(Request $request, Product $product)
@@ -113,6 +128,8 @@ class ProductController extends Controller
             'delete_media'   => 'nullable|array',
             'delete_media.*' => 'integer',
             'main_media_id'  => 'nullable|integer',
+            'vendor_id'      => 'nullable|exists:vendors,id',
+            'approval_status'=> 'nullable|in:pending,approved,rejected,inactive',
         ]);
 
         $validated['is_active']   = $request->boolean('is_active');
@@ -167,5 +184,23 @@ class ProductController extends Controller
 
         return redirect()->route('admin.products.index')
             ->with('success', 'تم حذف المنتج بنجاح');
+    }
+
+    public function approve(Product $product, \App\Services\ProductApprovalService $approval)
+    {
+        $approval->approve($product);
+        return back()->with('success', 'تم قبول المنتج.');
+    }
+
+    public function reject(Request $request, Product $product, \App\Services\ProductApprovalService $approval)
+    {
+        $approval->reject($product, $request->input('reason'));
+        return back()->with('success', 'تم رفض المنتج.');
+    }
+
+    public function disable(Product $product, \App\Services\ProductApprovalService $approval)
+    {
+        $approval->disable($product);
+        return back()->with('success', 'تم تعطيل المنتج.');
     }
 }

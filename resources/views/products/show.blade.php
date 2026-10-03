@@ -86,6 +86,15 @@
 
                     <h1 class="pd-title">{{ $product['name'] }}</h1>
 
+                    @if (!empty($product['vendor']))
+                        <p class="mb-2">
+                            {{ app()->getLocale() === 'ar' ? 'يُباع بواسطة:' : 'Sold by:' }}
+                            <a href="{{ route('stores.show', $product['vendor']['store_slug']) }}" class="fw-semibold text-primary">
+                                {{ $product['vendor']['store_name'] }}
+                            </a>
+                        </p>
+                    @endif
+
                     {{-- Rating --}}
                     <div class="pd-rating">
                         @for ($i = 0; $i < 5; $i++)
